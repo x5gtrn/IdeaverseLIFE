@@ -21,4 +21,6 @@ When categorizing or creating notes, strictly follow this framework:
 When asked to perform common tasks, follow these workflows:
 - **Cleanup / Categorization**: If you find loose notes in the root directory, analyze their content and move them into the appropriate ACE (Atlas, Calendar, Efforts) folders.
 - **Daily/Weekly Digest**: When asked to summarize recent activities, extract notes from the `Calendar` folder based on the date, compile them into a simple Markdown list, and highlight key action items.
-- **Project Extraction**: When summarizing a project, pull relevant meeting notes and task lists from
+- **Project Extraction**: When summarizing a project, pull relevant meeting notes and task lists from.
+	
+#x/claude
