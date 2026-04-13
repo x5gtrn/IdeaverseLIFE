@@ -59,4 +59,5 @@ A `CLAUDE.md` file is included at the root to guide [Claude Code](https://claude
 | --------------------------------------------------------------- | ---------------------------------------------- |
 | [x5gtrn/TIL](https://github.com/x5gtrn/TIL)                     | Today I Learned — public learning log          |
 | [x5gtrn/IdeaverseLIFE](https://github.com/x5gtrn/IdeaverseLIFE) | LIFE repository template and operational rules |
+
 #x/readme 
