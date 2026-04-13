@@ -4,7 +4,9 @@
       "iconref-a",
       "icon-ref-b",
       "context",
-      "palette"
+      "palette",
+      "bikee",
+      "art"
     ],
     "settings": {
       "note": [
@@ -105,7 +107,6 @@
     }
   },
   "calloutDetection": {
-    "obsidianFallbackForced": false,
     "obsidian": true,
     "theme": true,
     "snippet": true

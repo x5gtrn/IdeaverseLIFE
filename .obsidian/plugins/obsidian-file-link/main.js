@@ -6,467 +6,1165 @@ if you want to view the source visit the plugins github repository
 'use strict';
 
 var obsidian = require('obsidian');
+var require$$0 = require('electron');
 var fs = require('fs');
 var path = require('path');
 
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
-var path__default = /*#__PURE__*/_interopDefaultLegacy(path);
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-/* global Reflect, Promise */
-
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-    return extendStatics(d, b);
-};
-
-function __extends(d, b) {
-    if (typeof b !== "function" && b !== null)
-        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-}
-
-function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
+function _interopNamespaceDefault(e) {
+    var n = Object.create(null);
+    if (e) {
+        Object.keys(e).forEach(function (k) {
+            if (k !== 'default') {
+                var d = Object.getOwnPropertyDescriptor(e, k);
+                Object.defineProperty(n, k, d.get ? d : {
+                    enumerable: true,
+                    get: function () { return e[k]; }
+                });
             }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        });
     }
+    n.default = e;
+    return Object.freeze(n);
 }
 
-var DEFAULT_SETTINGS = {
+var fs__namespace = /*#__PURE__*/_interopNamespaceDefault(fs);
+var path__namespace = /*#__PURE__*/_interopNamespaceDefault(path);
+
+const DEFAULT_SETTINGS = {
     linkPrefix: "",
     showFileEnding: false,
     linkFolder: false,
+    useFolderName: false,
     embedFile: false,
-    shortLinks: false
 };
-var SUPPORTED_EMBED_FILE_TYPES = [
-    "md",
-    "png",
-    "jpg",
-    "jpeg",
-    "gif",
-    "bmp",
-    "svg",
-    "mp3",
-    "webm",
-    "wav",
-    "m4a",
-    "ogg",
-    "3gp",
-    "flac",
-    "mp4",
-    "webm",
-    "ogv",
-    "pdf",
+const SUPPORTED_EMBED_FILE_TYPES = [
+    ".md",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+    ".svg",
+    ".mp3",
+    ".webm",
+    ".wav",
+    ".m4a",
+    ".ogg",
+    ".3gp",
+    ".flac",
+    ".mp4",
+    ".webm",
+    ".ogv",
+    ".pdf",
 ];
 
-var FileLinkSettingTab = /** @class */ (function (_super) {
-    __extends(FileLinkSettingTab, _super);
-    function FileLinkSettingTab(app, plugin) {
-        var _this = _super.call(this, app, plugin) || this;
-        _this.plugin = plugin;
-        return _this;
+class FileLinkSettingTab extends obsidian.PluginSettingTab {
+    plugin;
+    constructor(app, plugin) {
+        super(app, plugin);
+        this.plugin = plugin;
     }
-    FileLinkSettingTab.prototype.display = function () {
-        var _this = this;
-        var containerEl = this.containerEl;
+    display() {
+        let { containerEl } = this;
         containerEl.empty();
         containerEl.createEl("h2", { text: "Better File Link Settings" });
         new obsidian.Setting(containerEl)
             .setName("List style for multiple files")
             .setDesc("Specify the characters shown before every file link.")
-            .addText(function (text) {
-            return text
-                .setPlaceholder("-")
-                .setValue(_this.plugin.settings.linkPrefix)
-                .onChange(function (value) { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.plugin.settings.linkPrefix = value;
-                            return [4 /*yield*/, this.plugin.saveSettings()];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        });
+            .addText((text) => text
+            .setPlaceholder("-")
+            .setValue(this.plugin.settings.linkPrefix)
+            .onChange(async (value) => {
+            this.plugin.settings.linkPrefix = value;
+            await this.plugin.saveSettings();
+        }));
         new obsidian.Setting(containerEl)
             .setName("Show file extension")
             .setDesc("Will show file endings when activated.")
-            .addToggle(function (toggle) {
-            return toggle
-                .setValue(_this.plugin.settings.showFileEnding)
-                .onChange(function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.plugin.settings.showFileEnding = toggle.getValue();
-                            return [4 /*yield*/, this.plugin.saveSettings()];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        });
+            .addToggle((toggle) => toggle
+            .setValue(this.plugin.settings.showFileEnding)
+            .onChange(async () => {
+            this.plugin.settings.showFileEnding = toggle.getValue();
+            await this.plugin.saveSettings();
+        }));
         new obsidian.Setting(containerEl)
             .setName("Embed file")
             .setDesc("Will copy the file to Obsidian and embed it in the note.")
-            .addToggle(function (toggle) {
-            return toggle.setValue(_this.plugin.settings.embedFile).onChange(function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.plugin.settings.embedFile = toggle.getValue();
-                            return [4 /*yield*/, this.plugin.saveSettings()];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        });
+            .addToggle((toggle) => toggle.setValue(this.plugin.settings.embedFile).onChange(async () => {
+            this.plugin.settings.embedFile = toggle.getValue();
+            await this.plugin.saveSettings();
+        }));
         new obsidian.Setting(containerEl)
             .setName("Link folder instead of file")
             .setDesc("Link will open the folder where the file is located instead of opening the file itself.")
-            .addToggle(function (toggle) {
-            return toggle.setValue(_this.plugin.settings.linkFolder).onChange(function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.plugin.settings.linkFolder = toggle.getValue();
-                            return [4 /*yield*/, this.plugin.saveSettings()];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        });
+            .addToggle((toggle) => toggle.setValue(this.plugin.settings.linkFolder).onChange(async () => {
+            this.plugin.settings.linkFolder = toggle.getValue();
+            await this.plugin.saveSettings();
+        }));
         new obsidian.Setting(containerEl)
-            .setName("Use short links")
-            .setDesc("Use short links instead of long links.")
-            .addToggle(function (toggle) {
-            return toggle.setValue(_this.plugin.settings.shortLinks).onChange(function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.plugin.settings.shortLinks = toggle.getValue();
-                            return [4 /*yield*/, this.plugin.saveSettings()];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        });
-    };
-    return FileLinkSettingTab;
-}(obsidian.PluginSettingTab));
+            .setName("Use folder name")
+            .setDesc('When linking to a folder, show only the folder name instead of the full path (e.g. "baz" instead of "/Users/foo/bar/baz").')
+            .addToggle((toggle) => toggle
+            .setValue(this.plugin.settings.useFolderName)
+            .onChange(async () => {
+            this.plugin.settings.useFolderName = toggle.getValue();
+            await this.plugin.saveSettings();
+        }));
+    }
+}
 
-var FileEmbeder = /** @class */ (function () {
-    function FileEmbeder(attachementFolder, basePath, settings) {
-        this.attachementFolder = attachementFolder;
-        this.basePath = basePath;
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+var renderer$1 = {};
+
+var remote = {};
+
+var callbacksRegistry = {};
+
+var hasRequiredCallbacksRegistry;
+
+function requireCallbacksRegistry () {
+	if (hasRequiredCallbacksRegistry) return callbacksRegistry;
+	hasRequiredCallbacksRegistry = 1;
+	Object.defineProperty(callbacksRegistry, "__esModule", { value: true });
+	callbacksRegistry.CallbacksRegistry = void 0;
+	class CallbacksRegistry {
+	    constructor() {
+	        this.nextId = 0;
+	        this.callbacks = {};
+	        this.callbackIds = new WeakMap();
+	        this.locationInfo = new WeakMap();
+	    }
+	    add(callback) {
+	        // The callback is already added.
+	        let id = this.callbackIds.get(callback);
+	        if (id != null)
+	            return id;
+	        id = this.nextId += 1;
+	        this.callbacks[id] = callback;
+	        this.callbackIds.set(callback, id);
+	        // Capture the location of the function and put it in the ID string,
+	        // so that release errors can be tracked down easily.
+	        const regexp = /at (.*)/gi;
+	        const stackString = (new Error()).stack;
+	        if (!stackString)
+	            return id;
+	        let filenameAndLine;
+	        let match;
+	        while ((match = regexp.exec(stackString)) !== null) {
+	            const location = match[1];
+	            if (location.includes('(native)'))
+	                continue;
+	            if (location.includes('(<anonymous>)'))
+	                continue;
+	            if (location.includes('callbacks-registry.js'))
+	                continue;
+	            if (location.includes('remote.js'))
+	                continue;
+	            if (location.includes('@electron/remote/dist'))
+	                continue;
+	            const ref = /([^/^)]*)\)?$/gi.exec(location);
+	            if (ref)
+	                filenameAndLine = ref[1];
+	            break;
+	        }
+	        this.locationInfo.set(callback, filenameAndLine);
+	        return id;
+	    }
+	    get(id) {
+	        return this.callbacks[id] || function () { };
+	    }
+	    getLocation(callback) {
+	        return this.locationInfo.get(callback);
+	    }
+	    apply(id, ...args) {
+	        return this.get(id).apply(commonjsGlobal, ...args);
+	    }
+	    remove(id) {
+	        const callback = this.callbacks[id];
+	        if (callback) {
+	            this.callbackIds.delete(callback);
+	            delete this.callbacks[id];
+	        }
+	    }
+	}
+	callbacksRegistry.CallbacksRegistry = CallbacksRegistry;
+	return callbacksRegistry;
+}
+
+var typeUtils = {};
+
+var hasRequiredTypeUtils;
+
+function requireTypeUtils () {
+	if (hasRequiredTypeUtils) return typeUtils;
+	hasRequiredTypeUtils = 1;
+	Object.defineProperty(typeUtils, "__esModule", { value: true });
+	typeUtils.deserialize = typeUtils.serialize = typeUtils.isSerializableObject = typeUtils.isPromise = void 0;
+	const electron_1 = require$$0;
+	function isPromise(val) {
+	    return (val &&
+	        val.then &&
+	        val.then instanceof Function &&
+	        val.constructor &&
+	        val.constructor.reject &&
+	        val.constructor.reject instanceof Function &&
+	        val.constructor.resolve &&
+	        val.constructor.resolve instanceof Function);
+	}
+	typeUtils.isPromise = isPromise;
+	const serializableTypes = [
+	    Boolean,
+	    Number,
+	    String,
+	    Date,
+	    Error,
+	    RegExp,
+	    ArrayBuffer
+	];
+	// https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#Supported_types
+	function isSerializableObject(value) {
+	    return value === null || ArrayBuffer.isView(value) || serializableTypes.some(type => value instanceof type);
+	}
+	typeUtils.isSerializableObject = isSerializableObject;
+	const objectMap = function (source, mapper) {
+	    const sourceEntries = Object.entries(source);
+	    const targetEntries = sourceEntries.map(([key, val]) => [key, mapper(val)]);
+	    return Object.fromEntries(targetEntries);
+	};
+	function serializeNativeImage(image) {
+	    const representations = [];
+	    const scaleFactors = image.getScaleFactors();
+	    // Use Buffer when there's only one representation for better perf.
+	    // This avoids compressing to/from PNG where it's not necessary to
+	    // ensure uniqueness of dataURLs (since there's only one).
+	    if (scaleFactors.length === 1) {
+	        const scaleFactor = scaleFactors[0];
+	        const size = image.getSize(scaleFactor);
+	        const buffer = image.toBitmap({ scaleFactor });
+	        representations.push({ scaleFactor, size, buffer });
+	    }
+	    else {
+	        // Construct from dataURLs to ensure that they are not lost in creation.
+	        for (const scaleFactor of scaleFactors) {
+	            const size = image.getSize(scaleFactor);
+	            const dataURL = image.toDataURL({ scaleFactor });
+	            representations.push({ scaleFactor, size, dataURL });
+	        }
+	    }
+	    return { __ELECTRON_SERIALIZED_NativeImage__: true, representations };
+	}
+	function deserializeNativeImage(value) {
+	    const image = electron_1.nativeImage.createEmpty();
+	    // Use Buffer when there's only one representation for better perf.
+	    // This avoids compressing to/from PNG where it's not necessary to
+	    // ensure uniqueness of dataURLs (since there's only one).
+	    if (value.representations.length === 1) {
+	        const { buffer, size, scaleFactor } = value.representations[0];
+	        const { width, height } = size;
+	        image.addRepresentation({ buffer, scaleFactor, width, height });
+	    }
+	    else {
+	        // Construct from dataURLs to ensure that they are not lost in creation.
+	        for (const rep of value.representations) {
+	            const { dataURL, size, scaleFactor } = rep;
+	            const { width, height } = size;
+	            image.addRepresentation({ dataURL, scaleFactor, width, height });
+	        }
+	    }
+	    return image;
+	}
+	function serialize(value) {
+	    if (value && value.constructor && value.constructor.name === 'NativeImage') {
+	        return serializeNativeImage(value);
+	    }
+	    if (Array.isArray(value)) {
+	        return value.map(serialize);
+	    }
+	    else if (isSerializableObject(value)) {
+	        return value;
+	    }
+	    else if (value instanceof Object) {
+	        return objectMap(value, serialize);
+	    }
+	    else {
+	        return value;
+	    }
+	}
+	typeUtils.serialize = serialize;
+	function deserialize(value) {
+	    if (value && value.__ELECTRON_SERIALIZED_NativeImage__) {
+	        return deserializeNativeImage(value);
+	    }
+	    else if (Array.isArray(value)) {
+	        return value.map(deserialize);
+	    }
+	    else if (isSerializableObject(value)) {
+	        return value;
+	    }
+	    else if (value instanceof Object) {
+	        return objectMap(value, deserialize);
+	    }
+	    else {
+	        return value;
+	    }
+	}
+	typeUtils.deserialize = deserialize;
+	return typeUtils;
+}
+
+var moduleNames = {};
+
+var getElectronBinding = {};
+
+var hasRequiredGetElectronBinding;
+
+function requireGetElectronBinding () {
+	if (hasRequiredGetElectronBinding) return getElectronBinding;
+	hasRequiredGetElectronBinding = 1;
+	Object.defineProperty(getElectronBinding, "__esModule", { value: true });
+	getElectronBinding.getElectronBinding = void 0;
+	const getElectronBinding$1 = (name) => {
+	    if (process._linkedBinding) {
+	        return process._linkedBinding('electron_common_' + name);
+	    }
+	    else if (process.electronBinding) {
+	        return process.electronBinding(name);
+	    }
+	    else {
+	        return null;
+	    }
+	};
+	getElectronBinding.getElectronBinding = getElectronBinding$1;
+	return getElectronBinding;
+}
+
+var hasRequiredModuleNames;
+
+function requireModuleNames () {
+	if (hasRequiredModuleNames) return moduleNames;
+	hasRequiredModuleNames = 1;
+	(function (exports$1) {
+		var _a, _b;
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.browserModuleNames = exports$1.commonModuleNames = void 0;
+		const get_electron_binding_1 = requireGetElectronBinding();
+		exports$1.commonModuleNames = [
+		    'clipboard',
+		    'nativeImage',
+		    'shell',
+		];
+		exports$1.browserModuleNames = [
+		    'app',
+		    'autoUpdater',
+		    'BaseWindow',
+		    'BrowserView',
+		    'BrowserWindow',
+		    'contentTracing',
+		    'crashReporter',
+		    'dialog',
+		    'globalShortcut',
+		    'ipcMain',
+		    'inAppPurchase',
+		    'Menu',
+		    'MenuItem',
+		    'nativeTheme',
+		    'net',
+		    'netLog',
+		    'MessageChannelMain',
+		    'Notification',
+		    'powerMonitor',
+		    'powerSaveBlocker',
+		    'protocol',
+		    'pushNotifications',
+		    'safeStorage',
+		    'screen',
+		    'session',
+		    'ServiceWorkerMain',
+		    'ShareMenu',
+		    'systemPreferences',
+		    'TopLevelWindow',
+		    'TouchBar',
+		    'Tray',
+		    'utilityProcess',
+		    'View',
+		    'webContents',
+		    'WebContentsView',
+		    'webFrameMain',
+		].concat(exports$1.commonModuleNames);
+		const features = get_electron_binding_1.getElectronBinding('features');
+		if (((_a = features === null || features === void 0 ? void 0 : features.isDesktopCapturerEnabled) === null || _a === void 0 ? void 0 : _a.call(features)) !== false) {
+		    exports$1.browserModuleNames.push('desktopCapturer');
+		}
+		if (((_b = features === null || features === void 0 ? void 0 : features.isViewApiEnabled) === null || _b === void 0 ? void 0 : _b.call(features)) !== false) {
+		    exports$1.browserModuleNames.push('ImageView');
+		} 
+	} (moduleNames));
+	return moduleNames;
+}
+
+var hasRequiredRemote;
+
+function requireRemote () {
+	if (hasRequiredRemote) return remote;
+	hasRequiredRemote = 1;
+	(function (exports$1) {
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		exports$1.createFunctionWithReturnValue = exports$1.getGlobal = exports$1.getCurrentWebContents = exports$1.getCurrentWindow = exports$1.getBuiltin = void 0;
+		const callbacks_registry_1 = requireCallbacksRegistry();
+		const type_utils_1 = requireTypeUtils();
+		const electron_1 = require$$0;
+		const module_names_1 = requireModuleNames();
+		const get_electron_binding_1 = requireGetElectronBinding();
+		const { Promise } = commonjsGlobal;
+		const callbacksRegistry = new callbacks_registry_1.CallbacksRegistry();
+		const remoteObjectCache = new Map();
+		const finalizationRegistry = new FinalizationRegistry((id) => {
+		    const ref = remoteObjectCache.get(id);
+		    if (ref !== undefined && ref.deref() === undefined) {
+		        remoteObjectCache.delete(id);
+		        electron_1.ipcRenderer.send("REMOTE_BROWSER_DEREFERENCE" /* BROWSER_DEREFERENCE */, contextId, id, 0);
+		    }
+		});
+		const electronIds = new WeakMap();
+		const isReturnValue = new WeakSet();
+		function getCachedRemoteObject(id) {
+		    const ref = remoteObjectCache.get(id);
+		    if (ref !== undefined) {
+		        const deref = ref.deref();
+		        if (deref !== undefined)
+		            return deref;
+		    }
+		}
+		function setCachedRemoteObject(id, value) {
+		    const wr = new WeakRef(value);
+		    remoteObjectCache.set(id, wr);
+		    finalizationRegistry.register(value, id);
+		    return value;
+		}
+		function getContextId() {
+		    const v8Util = get_electron_binding_1.getElectronBinding('v8_util');
+		    if (v8Util) {
+		        return v8Util.getHiddenValue(commonjsGlobal, 'contextId');
+		    }
+		    else {
+		        throw new Error('Electron >=v13.0.0-beta.6 required to support sandboxed renderers');
+		    }
+		}
+		// An unique ID that can represent current context.
+		const contextId = process.contextId || getContextId();
+		// Notify the main process when current context is going to be released.
+		// Note that when the renderer process is destroyed, the message may not be
+		// sent, we also listen to the "render-view-deleted" event in the main process
+		// to guard that situation.
+		process.on('exit', () => {
+		    const command = "REMOTE_BROWSER_CONTEXT_RELEASE" /* BROWSER_CONTEXT_RELEASE */;
+		    electron_1.ipcRenderer.send(command, contextId);
+		});
+		const IS_REMOTE_PROXY = Symbol('is-remote-proxy');
+		// Convert the arguments object into an array of meta data.
+		function wrapArgs(args, visited = new Set()) {
+		    const valueToMeta = (value) => {
+		        // Check for circular reference.
+		        if (visited.has(value)) {
+		            return {
+		                type: 'value',
+		                value: null
+		            };
+		        }
+		        if (value && value.constructor && value.constructor.name === 'NativeImage') {
+		            return { type: 'nativeimage', value: type_utils_1.serialize(value) };
+		        }
+		        else if (Array.isArray(value)) {
+		            visited.add(value);
+		            const meta = {
+		                type: 'array',
+		                value: wrapArgs(value, visited)
+		            };
+		            visited.delete(value);
+		            return meta;
+		        }
+		        else if (value instanceof Buffer) {
+		            return {
+		                type: 'buffer',
+		                value
+		            };
+		        }
+		        else if (type_utils_1.isSerializableObject(value)) {
+		            return {
+		                type: 'value',
+		                value
+		            };
+		        }
+		        else if (typeof value === 'object') {
+		            if (type_utils_1.isPromise(value)) {
+		                return {
+		                    type: 'promise',
+		                    then: valueToMeta(function (onFulfilled, onRejected) {
+		                        value.then(onFulfilled, onRejected);
+		                    })
+		                };
+		            }
+		            else if (electronIds.has(value)) {
+		                return {
+		                    type: 'remote-object',
+		                    id: electronIds.get(value)
+		                };
+		            }
+		            const meta = {
+		                type: 'object',
+		                name: value.constructor ? value.constructor.name : '',
+		                members: []
+		            };
+		            visited.add(value);
+		            for (const prop in value) { // eslint-disable-line guard-for-in
+		                meta.members.push({
+		                    name: prop,
+		                    value: valueToMeta(value[prop])
+		                });
+		            }
+		            visited.delete(value);
+		            return meta;
+		        }
+		        else if (typeof value === 'function' && isReturnValue.has(value)) {
+		            return {
+		                type: 'function-with-return-value',
+		                value: valueToMeta(value())
+		            };
+		        }
+		        else if (typeof value === 'function') {
+		            return {
+		                type: 'function',
+		                id: callbacksRegistry.add(value),
+		                location: callbacksRegistry.getLocation(value),
+		                length: value.length
+		            };
+		        }
+		        else {
+		            return {
+		                type: 'value',
+		                value
+		            };
+		        }
+		    };
+		    return args.map(valueToMeta);
+		}
+		// Populate object's members from descriptors.
+		// The |ref| will be kept referenced by |members|.
+		// This matches |getObjectMemebers| in rpc-server.
+		function setObjectMembers(ref, object, metaId, members) {
+		    if (!Array.isArray(members))
+		        return;
+		    for (const member of members) {
+		        if (Object.prototype.hasOwnProperty.call(object, member.name))
+		            continue;
+		        const descriptor = { enumerable: member.enumerable };
+		        if (member.type === 'method') {
+		            const remoteMemberFunction = function (...args) {
+		                let command;
+		                if (this && this.constructor === remoteMemberFunction) {
+		                    command = "REMOTE_BROWSER_MEMBER_CONSTRUCTOR" /* BROWSER_MEMBER_CONSTRUCTOR */;
+		                }
+		                else {
+		                    command = "REMOTE_BROWSER_MEMBER_CALL" /* BROWSER_MEMBER_CALL */;
+		                }
+		                const ret = electron_1.ipcRenderer.sendSync(command, contextId, metaId, member.name, wrapArgs(args));
+		                return metaToValue(ret);
+		            };
+		            let descriptorFunction = proxyFunctionProperties(remoteMemberFunction, metaId, member.name);
+		            descriptor.get = () => {
+		                descriptorFunction.ref = ref; // The member should reference its object.
+		                return descriptorFunction;
+		            };
+		            // Enable monkey-patch the method
+		            descriptor.set = (value) => {
+		                descriptorFunction = value;
+		                return value;
+		            };
+		            descriptor.configurable = true;
+		        }
+		        else if (member.type === 'get') {
+		            descriptor.get = () => {
+		                const command = "REMOTE_BROWSER_MEMBER_GET" /* BROWSER_MEMBER_GET */;
+		                const meta = electron_1.ipcRenderer.sendSync(command, contextId, metaId, member.name);
+		                return metaToValue(meta);
+		            };
+		            if (member.writable) {
+		                descriptor.set = (value) => {
+		                    const args = wrapArgs([value]);
+		                    const command = "REMOTE_BROWSER_MEMBER_SET" /* BROWSER_MEMBER_SET */;
+		                    const meta = electron_1.ipcRenderer.sendSync(command, contextId, metaId, member.name, args);
+		                    if (meta != null)
+		                        metaToValue(meta);
+		                    return value;
+		                };
+		            }
+		        }
+		        Object.defineProperty(object, member.name, descriptor);
+		    }
+		}
+		// Populate object's prototype from descriptor.
+		// This matches |getObjectPrototype| in rpc-server.
+		function setObjectPrototype(ref, object, metaId, descriptor) {
+		    if (descriptor === null)
+		        return;
+		    const proto = {};
+		    setObjectMembers(ref, proto, metaId, descriptor.members);
+		    setObjectPrototype(ref, proto, metaId, descriptor.proto);
+		    Object.setPrototypeOf(object, proto);
+		}
+		// Wrap function in Proxy for accessing remote properties
+		function proxyFunctionProperties(remoteMemberFunction, metaId, name) {
+		    let loaded = false;
+		    // Lazily load function properties
+		    const loadRemoteProperties = () => {
+		        if (loaded)
+		            return;
+		        loaded = true;
+		        const command = "REMOTE_BROWSER_MEMBER_GET" /* BROWSER_MEMBER_GET */;
+		        const meta = electron_1.ipcRenderer.sendSync(command, contextId, metaId, name);
+		        setObjectMembers(remoteMemberFunction, remoteMemberFunction, meta.id, meta.members);
+		    };
+		    return new Proxy(remoteMemberFunction, {
+		        set: (target, property, value) => {
+		            if (property !== 'ref')
+		                loadRemoteProperties();
+		            target[property] = value;
+		            return true;
+		        },
+		        get: (target, property) => {
+		            if (property === IS_REMOTE_PROXY)
+		                return true;
+		            if (!Object.prototype.hasOwnProperty.call(target, property))
+		                loadRemoteProperties();
+		            const value = target[property];
+		            if (property === 'toString' && typeof value === 'function') {
+		                return value.bind(target);
+		            }
+		            return value;
+		        },
+		        ownKeys: (target) => {
+		            loadRemoteProperties();
+		            return Object.getOwnPropertyNames(target);
+		        },
+		        getOwnPropertyDescriptor: (target, property) => {
+		            const descriptor = Object.getOwnPropertyDescriptor(target, property);
+		            if (descriptor)
+		                return descriptor;
+		            loadRemoteProperties();
+		            return Object.getOwnPropertyDescriptor(target, property);
+		        }
+		    });
+		}
+		// Convert meta data from browser into real value.
+		function metaToValue(meta) {
+		    if (!meta)
+		        return {};
+		    if (meta.type === 'value') {
+		        return meta.value;
+		    }
+		    else if (meta.type === 'array') {
+		        return meta.members.map((member) => metaToValue(member));
+		    }
+		    else if (meta.type === 'nativeimage') {
+		        return type_utils_1.deserialize(meta.value);
+		    }
+		    else if (meta.type === 'buffer') {
+		        return Buffer.from(meta.value.buffer, meta.value.byteOffset, meta.value.byteLength);
+		    }
+		    else if (meta.type === 'promise') {
+		        return Promise.resolve({ then: metaToValue(meta.then) });
+		    }
+		    else if (meta.type === 'error') {
+		        return metaToError(meta);
+		    }
+		    else if (meta.type === 'exception') {
+		        if (meta.value.type === 'error') {
+		            throw metaToError(meta.value);
+		        }
+		        else {
+		            throw new Error(`Unexpected value type in exception: ${meta.value.type}`);
+		        }
+		    }
+		    else {
+		        let ret;
+		        if ('id' in meta) {
+		            const cached = getCachedRemoteObject(meta.id);
+		            if (cached !== undefined) {
+		                return cached;
+		            }
+		        }
+		        // A shadow class to represent the remote function object.
+		        if (meta.type === 'function') {
+		            const remoteFunction = function (...args) {
+		                let command;
+		                if (this && this.constructor === remoteFunction) {
+		                    command = "REMOTE_BROWSER_CONSTRUCTOR" /* BROWSER_CONSTRUCTOR */;
+		                }
+		                else {
+		                    command = "REMOTE_BROWSER_FUNCTION_CALL" /* BROWSER_FUNCTION_CALL */;
+		                }
+		                const obj = electron_1.ipcRenderer.sendSync(command, contextId, meta.id, wrapArgs(args));
+		                return metaToValue(obj);
+		            };
+		            ret = remoteFunction;
+		        }
+		        else {
+		            ret = {};
+		        }
+		        setObjectMembers(ret, ret, meta.id, meta.members);
+		        setObjectPrototype(ret, ret, meta.id, meta.proto);
+		        if (ret.constructor && ret.constructor[IS_REMOTE_PROXY]) {
+		            Object.defineProperty(ret.constructor, 'name', { value: meta.name });
+		        }
+		        // Track delegate obj's lifetime & tell browser to clean up when object is GCed.
+		        electronIds.set(ret, meta.id);
+		        setCachedRemoteObject(meta.id, ret);
+		        return ret;
+		    }
+		}
+		function metaToError(meta) {
+		    const obj = meta.value;
+		    for (const { name, value } of meta.members) {
+		        obj[name] = metaToValue(value);
+		    }
+		    return obj;
+		}
+		function hasSenderId(input) {
+		    return typeof input.senderId === "number";
+		}
+		function handleMessage(channel, handler) {
+		    electron_1.ipcRenderer.on(channel, (event, passedContextId, id, ...args) => {
+		        if (hasSenderId(event)) {
+		            if (event.senderId !== 0 && event.senderId !== undefined) {
+		                console.error(`Message ${channel} sent by unexpected WebContents (${event.senderId})`);
+		                return;
+		            }
+		        }
+		        if (passedContextId === contextId) {
+		            handler(id, ...args);
+		        }
+		        else {
+		            // Message sent to an un-exist context, notify the error to main process.
+		            electron_1.ipcRenderer.send("REMOTE_BROWSER_WRONG_CONTEXT_ERROR" /* BROWSER_WRONG_CONTEXT_ERROR */, contextId, passedContextId, id);
+		        }
+		    });
+		}
+		const enableStacks = process.argv.includes('--enable-api-filtering-logging');
+		function getCurrentStack() {
+		    const target = { stack: undefined };
+		    if (enableStacks) {
+		        Error.captureStackTrace(target, getCurrentStack);
+		    }
+		    return target.stack;
+		}
+		// Browser calls a callback in renderer.
+		handleMessage("REMOTE_RENDERER_CALLBACK" /* RENDERER_CALLBACK */, (id, args) => {
+		    callbacksRegistry.apply(id, metaToValue(args));
+		});
+		// A callback in browser is released.
+		handleMessage("REMOTE_RENDERER_RELEASE_CALLBACK" /* RENDERER_RELEASE_CALLBACK */, (id) => {
+		    callbacksRegistry.remove(id);
+		});
+		exports$1.require = (module) => {
+		    const command = "REMOTE_BROWSER_REQUIRE" /* BROWSER_REQUIRE */;
+		    const meta = electron_1.ipcRenderer.sendSync(command, contextId, module, getCurrentStack());
+		    return metaToValue(meta);
+		};
+		// Alias to remote.require('electron').xxx.
+		function getBuiltin(module) {
+		    const command = "REMOTE_BROWSER_GET_BUILTIN" /* BROWSER_GET_BUILTIN */;
+		    const meta = electron_1.ipcRenderer.sendSync(command, contextId, module, getCurrentStack());
+		    return metaToValue(meta);
+		}
+		exports$1.getBuiltin = getBuiltin;
+		function getCurrentWindow() {
+		    const command = "REMOTE_BROWSER_GET_CURRENT_WINDOW" /* BROWSER_GET_CURRENT_WINDOW */;
+		    const meta = electron_1.ipcRenderer.sendSync(command, contextId, getCurrentStack());
+		    return metaToValue(meta);
+		}
+		exports$1.getCurrentWindow = getCurrentWindow;
+		// Get current WebContents object.
+		function getCurrentWebContents() {
+		    const command = "REMOTE_BROWSER_GET_CURRENT_WEB_CONTENTS" /* BROWSER_GET_CURRENT_WEB_CONTENTS */;
+		    const meta = electron_1.ipcRenderer.sendSync(command, contextId, getCurrentStack());
+		    return metaToValue(meta);
+		}
+		exports$1.getCurrentWebContents = getCurrentWebContents;
+		// Get a global object in browser.
+		function getGlobal(name) {
+		    const command = "REMOTE_BROWSER_GET_GLOBAL" /* BROWSER_GET_GLOBAL */;
+		    const meta = electron_1.ipcRenderer.sendSync(command, contextId, name, getCurrentStack());
+		    return metaToValue(meta);
+		}
+		exports$1.getGlobal = getGlobal;
+		// Get the process object in browser.
+		Object.defineProperty(exports$1, 'process', {
+		    enumerable: true,
+		    get: () => exports$1.getGlobal('process')
+		});
+		// Create a function that will return the specified value when called in browser.
+		function createFunctionWithReturnValue(returnValue) {
+		    const func = () => returnValue;
+		    isReturnValue.add(func);
+		    return func;
+		}
+		exports$1.createFunctionWithReturnValue = createFunctionWithReturnValue;
+		const addBuiltinProperty = (name) => {
+		    Object.defineProperty(exports$1, name, {
+		        enumerable: true,
+		        get: () => exports$1.getBuiltin(name)
+		    });
+		};
+		module_names_1.browserModuleNames
+		    .forEach(addBuiltinProperty); 
+	} (remote));
+	return remote;
+}
+
+var hasRequiredRenderer$1;
+
+function requireRenderer$1 () {
+	if (hasRequiredRenderer$1) return renderer$1;
+	hasRequiredRenderer$1 = 1;
+	(function (exports$1) {
+		var __createBinding = (renderer$1 && renderer$1.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+		    if (k2 === undefined) k2 = k;
+		    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+		}) : (function(o, m, k, k2) {
+		    if (k2 === undefined) k2 = k;
+		    o[k2] = m[k];
+		}));
+		var __exportStar = (renderer$1 && renderer$1.__exportStar) || function(m, exports$1) {
+		    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports$1, p)) __createBinding(exports$1, m, p);
+		};
+		Object.defineProperty(exports$1, "__esModule", { value: true });
+		if (process.type === 'browser')
+		    throw new Error(`"@electron/remote" cannot be required in the browser process. Instead require("@electron/remote/main").`);
+		__exportStar(requireRemote(), exports$1); 
+	} (renderer$1));
+	return renderer$1;
+}
+
+var renderer;
+var hasRequiredRenderer;
+
+function requireRenderer () {
+	if (hasRequiredRenderer) return renderer;
+	hasRequiredRenderer = 1;
+	renderer = requireRenderer$1();
+	return renderer;
+}
+
+var rendererExports = requireRenderer();
+
+class FileEmbeder {
+    settings;
+    constructor(settings) {
         this.settings = settings;
     }
-    FileEmbeder.prototype.embedFile = function (file) {
-        var _a;
-        var fileType = (_a = file.name.split(".").pop()) !== null && _a !== void 0 ? _a : "";
-        if (SUPPORTED_EMBED_FILE_TYPES.contains(fileType)) {
-            if (!this.attachementFolder) {
-                this.attachementFolder = "";
-            }
-            //@ts-ignore
-            this.copyFile(file.path, this.basePath + "/" + this.attachementFolder);
+    getEmbedMarkdownLink(filePath) {
+        const { ext } = this.getPathInformation(filePath);
+        if (!SUPPORTED_EMBED_FILE_TYPES.includes(ext)) {
+            new obsidian.Notice(`Files of this type are not supported for embedding in Obsidian.`);
         }
-        else {
-            new obsidian.Notice("This file type (" + fileType + ") is not supported for embed.");
-        }
-    };
-    FileEmbeder.prototype.embedLinkFor = function (file) {
-        var filename = this.pathInfo(file).filename;
-        return "![[" + filename + "]]";
-    };
-    FileEmbeder.prototype.copyFile = function (file, dir2) {
-        var f = path__default['default'].basename(file);
-        var source = fs__default['default'].createReadStream(file);
-        var dest = fs__default['default'].createWriteStream(path__default['default'].resolve(dir2, f));
-        source.pipe(dest);
-        source.on("end", function () {
-            console.log("Succesfully copied");
-        });
-        source.on("error", function (err) {
-            console.log(err);
-        });
-    };
-    FileEmbeder.prototype.pathInfo = function (file) {
-        var _a;
-        //@ts-ignore
-        var path = file.path;
-        var pathComponents = path.split("/");
-        if (path.contains("\\")) {
-            pathComponents = path.split("\\");
-        }
-        var filename = (_a = pathComponents.pop()) !== null && _a !== void 0 ? _a : "";
-        return { path: path, pathComponents: pathComponents, filename: filename };
-    };
-    FileEmbeder.prototype.linkFor = function (file, printPrefix) {
-        var _a = this.pathInfo(file), path = _a.path, pathComponents = _a.pathComponents, linkName = _a.filename;
-        var prefixString = "";
-        if (!this.settings.showFileEnding) {
-            var filenameComponents = linkName.split(".");
-            filenameComponents.pop();
-            linkName = filenameComponents.join(".");
-        }
-        if (this.settings.linkFolder) {
-            linkName = pathComponents[pathComponents.length - 1]; // .peek()
-            path = pathComponents.join("/");
-        }
-        if (printPrefix) {
-            prefixString = this.settings.linkPrefix;
-        }
-        if (this.settings.shortLinks) {
-            return prefixString + "[" + linkName + "](<file:///" + path + ">)\n";
-        }
-        return (prefixString +
-            "[" +
-            linkName +
-            "](file:///" +
-            encodeURIComponent(path) +
-            ")\n");
-    };
-    return FileEmbeder;
-}());
-
-var FileLinkModal = /** @class */ (function (_super) {
-    __extends(FileLinkModal, _super);
-    function FileLinkModal(app, plugin) {
-        var _this = _super.call(this, app) || this;
-        _this.plugin = plugin;
-        return _this;
+        return "!" + this.getMarkdownLink(filePath, false);
     }
-    FileLinkModal.prototype.onOpen = function () {
-        var _this = this;
-        var contentEl = this.contentEl;
-        contentEl.createEl("h2", { text: "Select files:" });
-        var input = contentEl.createEl("input", {
-            type: "file",
-            attr: { multiple: "" }
+    copyFile(sourcePath, targetDir) {
+        try {
+            fs__namespace.mkdirSync(targetDir, { recursive: true });
+            const filename = path__namespace.basename(sourcePath);
+            const destPath = path__namespace.join(targetDir, filename);
+            fs__namespace.copyFileSync(sourcePath, destPath);
+            return destPath;
+        }
+        catch (err) {
+            console.error("Copy failed:", err);
+            throw new Error(`File copy failed: ${err.message}`);
+        }
+    }
+    getPathInformation(filePath) {
+        const normalizedPath = path__namespace.normalize(filePath);
+        const parsedPath = path__namespace.parse(normalizedPath);
+        return {
+            fullPath: normalizedPath,
+            dir: parsedPath.dir,
+            filename: parsedPath.base,
+            name: parsedPath.name,
+            ext: parsedPath.ext,
+        };
+    }
+    getMarkdownLink(filePath, printPrefix) {
+        const pathInfo = this.getPathInformation(filePath);
+        const prefix = printPrefix ? this.settings.linkPrefix : "";
+        let linkText = pathInfo.name;
+        if (this.settings.linkFolder) {
+            linkText = this.settings.useFolderName
+                ? path__namespace.basename(pathInfo.dir)
+                : pathInfo.dir;
+        }
+        if (this.settings.showFileEnding) {
+            linkText = pathInfo.filename;
+        }
+        const linkPath = this.settings.linkFolder
+            ? pathInfo.dir
+            : pathInfo.fullPath;
+        return this.formatMarkdownLink(prefix, linkText, linkPath);
+    }
+    formatMarkdownLink(prefix, text, path) {
+        const space = prefix && prefix !== "!" ? " " : "";
+        return `${prefix}${space}[${text}](<file:///${path}>)\n`;
+    }
+}
+
+class FileLinkModal extends obsidian.Modal {
+    plugin;
+    selectedFilesDiv = document.createElement("div");
+    filePaths = [];
+    constructor(app, plugin) {
+        super(app);
+        this.plugin = plugin;
+    }
+    async onOpen() {
+        const { contentEl } = this;
+        const mainContainer = contentEl.createEl("div", {
+            cls: "bfl-container",
         });
-        contentEl.createEl("br");
-        contentEl.createEl("br");
-        var checkboxEmbed = contentEl.createEl("input", {
-            type: "checkbox",
-            attr: { id: "embed" }
+        const fileSelectionSection = mainContainer.createEl("div", {
+            cls: "bfl-selection-section",
         });
-        contentEl.createEl("label", { text: "Embed file", attr: { "for": "embed" } });
-        contentEl.createEl("br");
-        var checkboxFileFolder = contentEl.createEl("input", {
-            type: "checkbox",
-            attr: { id: "file-folder" }
+        const fileButton = fileSelectionSection.createEl("button", {
+            text: "Select files",
+            cls: "mod-cta",
         });
-        contentEl.createEl("label", {
-            text: "Link folder",
-            attr: { "for": "file-folder" }
+        this.selectedFilesDiv = fileSelectionSection.createEl("div", {
+            cls: "bfl-selected-files",
         });
-        contentEl.createEl("br");
-        var checkboxFileEnding = contentEl.createEl("input", {
-            type: "checkbox",
-            attr: { id: "file-ending" }
+        this.displaySelectedFiles([]);
+        const checkboxContainer = mainContainer.createEl("div", {
+            cls: "bfl-checkbox-container",
         });
-        contentEl.createEl("label", {
-            text: "Show file extension",
-            attr: { "for": "file-ending" }
+        const createCheckboxGroup = (id, label, initialValue) => {
+            const wrapper = checkboxContainer.createEl("div", {
+                cls: "bfl-checkbox-group",
+            });
+            const checkbox = wrapper.createEl("input", {
+                type: "checkbox",
+                attr: {
+                    id: id,
+                    style: "margin: 0;",
+                },
+            });
+            wrapper.createEl("label", {
+                text: label,
+                attr: {
+                    for: id,
+                    style: "margin: 0; user-select: none;",
+                },
+            });
+            checkbox.checked = initialValue;
+            return checkbox;
+        };
+        const checkboxEmbed = createCheckboxGroup("embed", "Embed file", this.plugin.settings.embedFile);
+        const checkboxFileFolder = createCheckboxGroup("file-folder", "Link folder", this.plugin.settings.linkFolder);
+        const checkboxFolderName = createCheckboxGroup("folder-name", "Use folder name", this.plugin.settings.useFolderName);
+        const checkboxFileEnding = createCheckboxGroup("file-ending", "Show file extension", this.plugin.settings.showFileEnding);
+        const buttonContainer = mainContainer.createEl("div", {
+            cls: "button-container",
+            attr: {
+                style: "margin-top: 5px;",
+            },
         });
-        contentEl.createEl("br");
-        var checkboxShortLink = contentEl.createEl("input", {
-            type: "checkbox",
-            attr: { id: "short-link" }
+        const submitButton = buttonContainer.createEl("button", {
+            text: "Add file link",
+            cls: "mod-cta",
         });
-        contentEl.createEl("label", {
-            text: "Use short links",
-            attr: { "for": "short-link" }
+        contentEl.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                submitButton.click();
+            }
         });
-        contentEl.createEl("br");
-        contentEl.createEl("br");
-        contentEl.createEl("br");
-        checkboxFileEnding.checked = this.plugin.settings.showFileEnding;
-        checkboxFileFolder.checked = this.plugin.settings.linkFolder;
-        checkboxEmbed.checked = this.plugin.settings.embedFile;
-        checkboxShortLink.checked = this.plugin.settings.shortLinks;
-        var button = contentEl.createEl("button", { text: "Add file link" });
-        button.addEventListener("click", function () {
-            var embedFile = checkboxEmbed.checked;
-            var fileList = input.files;
-            if (fileList) {
-                var files_1 = Array.from(fileList);
-                _this.plugin.settings.linkFolder = checkboxFileFolder.checked;
-                _this.plugin.settings.showFileEnding = checkboxFileEnding.checked;
-                _this.plugin.settings.embedFile = embedFile;
-                _this.plugin.settings.shortLinks = checkboxShortLink.checked;
-                //@ts-ignore
-                var attachementFolder = _this.app.vault.config.attachmentFolderPath;
-                //@ts-ignore
-                var basePath = _this.app.vault.adapter.basePath;
-                var fe_1 = new FileEmbeder(attachementFolder, basePath, _this.plugin.settings);
-                if (embedFile) {
-                    files_1.forEach(function (file) {
-                        fe_1.embedFile(file);
-                        var embedLinkToFile = fe_1.embedLinkFor(file);
-                        _this.addAtCursor(embedLinkToFile);
+        fileButton.addEventListener("click", async () => {
+            try {
+                const result = await rendererExports.dialog.showOpenDialog({
+                    properties: ["openFile", "multiSelections"],
+                    filters: [{ name: "All Files", extensions: ["*"] }],
+                });
+                if (!result.canceled && result.filePaths.length > 0) {
+                    this.filePaths = result.filePaths;
+                    this.displaySelectedFiles(this.filePaths);
+                }
+            }
+            catch (error) {
+                new obsidian.Notice("Error selecting files: " + error.message);
+            }
+        });
+        submitButton.addEventListener("click", () => {
+            if (this.filePaths.length > 0) {
+                // Update settings
+                this.plugin.settings.linkFolder = checkboxFileFolder.checked;
+                this.plugin.settings.useFolderName = checkboxFolderName.checked;
+                this.plugin.settings.showFileEnding = checkboxFileEnding.checked;
+                this.plugin.settings.embedFile = checkboxEmbed.checked;
+                const fe = new FileEmbeder(this.plugin.settings);
+                if (checkboxEmbed.checked) {
+                    this.filePaths.forEach((file) => {
+                        const embedMarkdownLink = fe.getEmbedMarkdownLink(file);
+                        this.addAtCursor(embedMarkdownLink);
                     });
                 }
                 else {
-                    var linkString_1 = "";
-                    files_1.forEach(function (file) {
-                        if (files_1.length != 1) {
-                            linkString_1 = linkString_1 + fe_1.linkFor(file, true);
-                        }
-                        else {
-                            linkString_1 = linkString_1 + fe_1.linkFor(file, false);
-                        }
+                    let linkString = "";
+                    this.filePaths.forEach((file) => {
+                        linkString += fe.getMarkdownLink(file, this.filePaths.length > 1);
                     });
-                    _this.addAtCursor(linkString_1);
+                    this.addAtCursor(linkString);
                 }
-                _this.close();
-                new obsidian.Notice("Added File Link");
+                this.close();
+                new obsidian.Notice(`Added ${this.filePaths.length} file link(s)`);
             }
             else {
                 new obsidian.Notice("No files selected");
             }
         });
-    };
-    FileLinkModal.prototype.addAtCursor = function (s) {
-        var mdView = this.app.workspace.getActiveViewOfType(obsidian.MarkdownView);
-        if (mdView) {
-            var doc = mdView.editor;
-            var currentLine = doc.getCursor();
-            doc.replaceRange(s, currentLine, currentLine);
-        }
-    };
-    FileLinkModal.prototype.onClose = function () {
-        var contentEl = this.contentEl;
-        contentEl.empty();
-    };
-    return FileLinkModal;
-}(obsidian.Modal));
-
-var FileLink = /** @class */ (function (_super) {
-    __extends(FileLink, _super);
-    function FileLink() {
-        return _super !== null && _super.apply(this, arguments) || this;
     }
-    FileLink.prototype.onload = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        console.log("loading plugin file-link");
-                        return [4 /*yield*/, this.loadSettings()];
-                    case 1:
-                        _a.sent();
-                        this.addSettingTab(new FileLinkSettingTab(this.app, this));
-                        this.addCommand({
-                            id: "add-file-link",
-                            name: "Add File Link",
-                            editorCallback: function () {
-                                new FileLinkModal(_this.app, _this).open();
-                            }
-                        });
-                        return [2 /*return*/];
-                }
+    displaySelectedFiles(files) {
+        this.selectedFilesDiv.empty();
+        if (files.length === 0) {
+            this.selectedFilesDiv.createEl("p", {
+                text: "No files selected",
+                cls: "no-files-message",
+                attr: {
+                    style: "color: var(--text-muted); font-style: italic; margin: 0; padding: 8px;",
+                },
+            });
+            return;
+        }
+        const fileList = this.selectedFilesDiv.createEl("ul", {
+            cls: "selected-files-list",
+            attr: {
+                style: "list-style: none; padding: 0; margin: 0;",
+            },
+        });
+        files.forEach((filePath) => {
+            const fileName = filePath.split(/[\\/]/).pop() || filePath;
+            fileList.createEl("li", {
+                text: fileName,
+                cls: "selected-file-item",
+                attr: {
+                    style: "padding: 4px 8px; border-bottom: 1px solid var(--background-modifier-border);",
+                },
             });
         });
-    };
-    FileLink.prototype.onunload = function () {
+    }
+    addAtCursor(s) {
+        const markdownView = this.app.workspace.getActiveViewOfType(obsidian.MarkdownView);
+        if (markdownView) {
+            const editor = markdownView.editor;
+            const currentLine = editor.getCursor();
+            editor.replaceRange(s, currentLine, currentLine);
+        }
+    }
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
+
+const FILE_URI_REGEX = /file:\/\/[^\s)>"]+/g;
+async function findBrokenFileLinks(vault) {
+    const results = new Map();
+    const files = vault.getMarkdownFiles();
+    for (const file of files) {
+        const content = await vault.read(file);
+        const broken = [];
+        let match;
+        FILE_URI_REGEX.lastIndex = 0;
+        while ((match = FILE_URI_REGEX.exec(content)) !== null) {
+            const uri = match[0];
+            const filePath = decodeURIComponent(new URL(uri).pathname);
+            if (!fs__namespace.existsSync(filePath)) {
+                broken.push(uri);
+            }
+        }
+        if (broken.length > 0) {
+            results.set(file, broken);
+        }
+    }
+    return results;
+}
+
+class BrokenLinksModal extends obsidian.Modal {
+    brokenLinks;
+    constructor(app, brokenLinks) {
+        super(app);
+        this.brokenLinks = brokenLinks;
+    }
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl("h2", { text: "Broken File Links" });
+        for (const [file, links] of this.brokenLinks) {
+            const header = contentEl.createEl("h3");
+            const noteLink = header.createEl("a", { text: file.basename });
+            noteLink.addEventListener("click", () => {
+                this.app.workspace.getLeaf().openFile(file);
+                this.close();
+            });
+            const list = contentEl.createEl("ul");
+            for (const link of links) {
+                const item = list.createEl("li");
+                item.createEl("span", {
+                    text: link,
+                    attr: { style: "word-break: break-all;" },
+                });
+            }
+        }
+    }
+    onClose() {
+        this.contentEl.empty();
+    }
+}
+
+class FileLink extends obsidian.Plugin {
+    settings = DEFAULT_SETTINGS;
+    async onload() {
+        console.log("loading plugin file-link");
+        await this.loadSettings();
+        this.addSettingTab(new FileLinkSettingTab(this.app, this));
+        this.addCommand({
+            id: "add-file-link",
+            name: "Add File Link",
+            editorCallback: () => {
+                new FileLinkModal(this.app, this).open();
+            },
+        });
+        this.addCommand({
+            id: "check-broken-file-links",
+            name: "Check for broken file links",
+            callback: async () => {
+                new obsidian.Notice("Scanning for broken file links...");
+                const brokenLinks = await findBrokenFileLinks(this.app.vault);
+                if (brokenLinks.size === 0) {
+                    new obsidian.Notice("No broken file links found.");
+                    return;
+                }
+                new BrokenLinksModal(this.app, brokenLinks).open();
+            },
+        });
+    }
+    onunload() {
         console.log("unloading plugin file-link");
-    };
-    FileLink.prototype.loadSettings = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, _b, _c, _d;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
-                    case 0:
-                        _a = this;
-                        _c = (_b = Object).assign;
-                        _d = [{}, DEFAULT_SETTINGS];
-                        return [4 /*yield*/, this.loadData()];
-                    case 1:
-                        _a.settings = _c.apply(_b, _d.concat([_e.sent()]));
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    FileLink.prototype.saveSettings = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.saveData(this.settings)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return FileLink;
-}(obsidian.Plugin));
+    }
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
+}
 
 module.exports = FileLink;
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZXMiOlsibm9kZV9tb2R1bGVzL3RzbGliL3RzbGliLmVzNi5qcyIsInNyYy9jb25zdGFudHMudHN4Iiwic3JjL0ZpbGVMaW5rU2V0dGluZ3NUYWIudHN4Iiwic3JjL0ZpbGVFbWJlZGVyLnRzeCIsInNyYy9GaWxlTGlua01vZGFsLnRzeCIsIm1haW4udHMiXSwic291cmNlc0NvbnRlbnQiOm51bGwsIm5hbWVzIjpbIlNldHRpbmciLCJQbHVnaW5TZXR0aW5nVGFiIiwiTm90aWNlIiwicGF0aCIsImZzIiwiTWFya2Rvd25WaWV3IiwiTW9kYWwiLCJQbHVnaW4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLElBQUksYUFBYSxHQUFHLFNBQVMsQ0FBQyxFQUFFLENBQUMsRUFBRTtBQUNuQyxJQUFJLGFBQWEsR0FBRyxNQUFNLENBQUMsY0FBYztBQUN6QyxTQUFTLEVBQUUsU0FBUyxFQUFFLEVBQUUsRUFBRSxZQUFZLEtBQUssSUFBSSxVQUFVLENBQUMsRUFBRSxDQUFDLEVBQUUsRUFBRSxDQUFDLENBQUMsU0FBUyxHQUFHLENBQUMsQ0FBQyxFQUFFLENBQUM7QUFDcEYsUUFBUSxVQUFVLENBQUMsRUFBRSxDQUFDLEVBQUUsRUFBRSxLQUFLLElBQUksQ0FBQyxJQUFJLENBQUMsRUFBRSxJQUFJLE1BQU0sQ0FBQyxTQUFTLENBQUMsY0FBYyxDQUFDLElBQUksQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDLENBQUMsQ0FBQyxHQUFHLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxFQUFFLENBQUM7QUFDMUcsSUFBSSxPQUFPLGFBQWEsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDLENBQUM7QUFDL0IsQ0FBQyxDQUFDO0FBQ0Y7QUFDTyxTQUFTLFNBQVMsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxFQUFFO0FBQ2hDLElBQUksSUFBSSxPQUFPLENBQUMsS0FBSyxVQUFVLElBQUksQ0FBQyxLQUFLLElBQUk7QUFDN0MsUUFBUSxNQUFNLElBQUksU0FBUyxDQUFDLHNCQUFzQixHQUFHLE1BQU0sQ0FBQyxDQUFDLENBQUMsR0FBRywrQkFBK0IsQ0FBQyxDQUFDO0FBQ2xHLElBQUksYUFBYSxDQUFDLENBQUMsRUFBRSxDQUFDLENBQUMsQ0FBQztBQUN4QixJQUFJLFNBQVMsRUFBRSxHQUFHLEVBQUUsSUFBSSxDQUFDLFdBQVcsR0FBRyxDQUFDLENBQUMsRUFBRTtBQUMzQyxJQUFJLENBQUMsQ0FBQyxTQUFTLEdBQUcsQ0FBQyxLQUFLLElBQUksR0FBRyxNQUFNLENBQUMsTUFBTSxDQUFDLENBQUMsQ0FBQyxJQUFJLEVBQUUsQ0FBQyxTQUFTLEdBQUcsQ0FBQyxDQUFDLFNBQVMsRUFBRSxJQUFJLEVBQUUsRUFBRSxDQUFDLENBQUM7QUFDekYsQ0FBQztBQXVDRDtBQUNPLFNBQVMsU0FBUyxDQUFDLE9BQU8sRUFBRSxVQUFVLEVBQUUsQ0FBQyxFQUFFLFNBQVMsRUFBRTtBQUM3RCxJQUFJLFNBQVMsS0FBSyxDQUFDLEtBQUssRUFBRSxFQUFFLE9BQU8sS0FBSyxZQUFZLENBQUMsR0FBRyxLQUFLLEdBQUcsSUFBSSxDQUFDLENBQUMsVUFBVSxPQUFPLEVBQUUsRUFBRSxPQUFPLENBQUMsS0FBSyxDQUFDLENBQUMsRUFBRSxDQUFDLENBQUMsRUFBRTtBQUNoSCxJQUFJLE9BQU8sS0FBSyxDQUFDLEtBQUssQ0FBQyxHQUFHLE9BQU8sQ0FBQyxFQUFFLFVBQVUsT0FBTyxFQUFFLE1BQU0sRUFBRTtBQUMvRCxRQUFRLFNBQVMsU0FBUyxDQUFDLEtBQUssRUFBRSxFQUFFLElBQUksRUFBRSxJQUFJLENBQUMsU0FBUyxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxPQUFPLENBQUMsRUFBRSxFQUFFLE1BQU0sQ0FBQyxDQUFDLENBQUMsQ0FBQyxFQUFFLEVBQUU7QUFDbkcsUUFBUSxTQUFTLFFBQVEsQ0FBQyxLQUFLLEVBQUUsRUFBRSxJQUFJLEVBQUUsSUFBSSxDQUFDLFNBQVMsQ0FBQyxPQUFPLENBQUMsQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxPQUFPLENBQUMsRUFBRSxFQUFFLE1BQU0sQ0FBQyxDQUFDLENBQUMsQ0FBQyxFQUFFLEVBQUU7QUFDdEcsUUFBUSxTQUFTLElBQUksQ0FBQyxNQUFNLEVBQUUsRUFBRSxNQUFNLENBQUMsSUFBSSxHQUFHLE9BQU8sQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLEdBQUcsS0FBSyxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMsQ0FBQyxJQUFJLENBQUMsU0FBUyxFQUFFLFFBQVEsQ0FBQyxDQUFDLEVBQUU7QUFDdEgsUUFBUSxJQUFJLENBQUMsQ0FBQyxTQUFTLEdBQUcsU0FBUyxDQUFDLEtBQUssQ0FBQyxPQUFPLEVBQUUsVUFBVSxJQUFJLEVBQUUsQ0FBQyxFQUFFLElBQUksRUFBRSxDQUFDLENBQUM7QUFDOUUsS0FBSyxDQUFDLENBQUM7QUFDUCxDQUFDO0FBQ0Q7QUFDTyxTQUFTLFdBQVcsQ0FBQyxPQUFPLEVBQUUsSUFBSSxFQUFFO0FBQzNDLElBQUksSUFBSSxDQUFDLEdBQUcsRUFBRSxLQUFLLEVBQUUsQ0FBQyxFQUFFLElBQUksRUFBRSxXQUFXLEVBQUUsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLEdBQUcsQ0FBQyxFQUFFLE1BQU0sQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsRUFBRSxFQUFFLElBQUksRUFBRSxFQUFFLEVBQUUsR0FBRyxFQUFFLEVBQUUsRUFBRSxFQUFFLENBQUMsRUFBRSxDQUFDLEVBQUUsQ0FBQyxFQUFFLENBQUMsQ0FBQztBQUNySCxJQUFJLE9BQU8sQ0FBQyxHQUFHLEVBQUUsSUFBSSxFQUFFLElBQUksQ0FBQyxDQUFDLENBQUMsRUFBRSxPQUFPLEVBQUUsSUFBSSxDQUFDLENBQUMsQ0FBQyxF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
+
+
+/* nosourcemap */
